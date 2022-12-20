@@ -1,16 +1,39 @@
+<script setup>
+import { message } from 'src/composables/useMessage.js'
+</script>
+
 <template>
-  <q-page class="flex flex-center">
-    <q-icon
-      name="svguse:icons.svg#ethernet"
-      style="width: 400px; height: 400px"
-    />
-  </q-page>
+  <q-table
+    :columns="[
+      {
+        name: 'time',
+        align: 'center',
+        label: 'Time',
+        field: 'time',
+        sortable: true
+      },
+      {
+        name: 'from',
+        align: 'center',
+        label: 'from',
+        field: 'name',
+        sortable: true
+      },
+      {
+        name: 'message',
+        align: 'center',
+        label: 'Message',
+        field: 'message'
+      }
+    ]"
+    :rows="message"
+    flat
+    dense
+    :pagination="{
+      rowsPerPage: 0
+    }"
+  >
+  </q-table>
 </template>
 
-<script>
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  name: "IndexPage",
-});
-</script>
+<style scoped></style>

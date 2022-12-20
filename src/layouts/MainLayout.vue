@@ -3,6 +3,7 @@ import { ref, defineEmits } from 'vue'
 import { tcp } from 'src/composables/useTcp'
 import { udpServer, udpSender } from 'src/composables/useUdp'
 import LeftSide from 'src/components/leftSide'
+import Footer from 'src/components/footerCom'
 
 const drawer = ref(false)
 const miniState = ref(false)
@@ -100,11 +101,7 @@ const drawerClick = (e) => {
     </q-page-container>
 
     <q-footer elevated class="bg-grey-8 text-white">
-      <q-toolbar>
-        <q-toolbar-title>
-          <div>Title</div>
-        </q-toolbar-title>
-      </q-toolbar>
+      <Footer />
     </q-footer>
   </q-layout>
 </template>

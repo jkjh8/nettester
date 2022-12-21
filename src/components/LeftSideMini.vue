@@ -1,6 +1,7 @@
 <script setup>
 import { tcp } from 'src/composables/useTcp'
 import { udpServer, udpSender } from 'src/composables/useUdp'
+import TooltipDelay from 'src/components/tooltipDelay'
 </script>
 
 <template>
@@ -13,13 +14,7 @@ import { udpServer, udpSender } from 'src/composables/useUdp'
       "
       size="sm"
     >
-      <q-tooltip
-        style="width: 70px; background: #888888aa"
-        anchor="bottom right"
-        self="center right"
-      >
-        TCP {{ tcp.mode }}</q-tooltip
-      >
+      <TooltipDelay :msg="`TCP ${tcp.mode}`" :width="70" />
     </q-icon>
 
     <q-icon
@@ -30,13 +25,7 @@ import { udpServer, udpSender } from 'src/composables/useUdp'
       "
       size="sm"
     >
-      <q-tooltip
-        style="width: 70px; background: #888888aa"
-        anchor="bottom right"
-        self="center right"
-      >
-        UDP Server</q-tooltip
-      >
+      <TooltipDelay msg="UDP SERVER" :width="80" />
     </q-icon>
 
     <q-icon
@@ -47,13 +36,7 @@ import { udpServer, udpSender } from 'src/composables/useUdp'
       "
       size="sm"
     >
-      <q-tooltip
-        style="width: 75px; background: #888888aa"
-        anchor="bottom right"
-        self="center right"
-      >
-        UDP Sender</q-tooltip
-      >
+      <TooltipDelay msg="UDP SENDER" :width="85" />
     </q-icon>
   </div>
 </template>

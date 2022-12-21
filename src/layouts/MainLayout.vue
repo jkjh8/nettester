@@ -5,6 +5,7 @@ import { udpServer, udpSender } from 'src/composables/useUdp'
 import LeftSide from 'src/components/LeftSide'
 import LeftSideMini from 'src/components/LeftSideMini'
 import Footer from 'src/components/footerCom'
+import TooltipDelay from 'src/components/tooltipDelay'
 
 const drawer = ref(false)
 const miniState = ref(false)
@@ -26,6 +27,12 @@ const drawerClick = (e) => {
         </q-btn>
 
         <q-toolbar-title> Net Test Tool </q-toolbar-title>
+
+        <div>
+          <q-btn color="red-10" flat round icon="delete">
+            <TooltipDelay msg="CLEAR ALL" />
+          </q-btn>
+        </div>
       </q-toolbar>
     </q-header>
 

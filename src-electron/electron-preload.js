@@ -1,8 +1,14 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('myAPI', {
-  onRequest: (args) => {
-    ipcRenderer.send('onRequest', { ...args })
+  tcpMsg: (args) => {
+    ipcRenderer.send('tcpMsg', { ...args })
+  },
+  udpServerMsg: (args) => {
+    ipcRenderer.send('udpServerMsg', { ...args })
+  },
+  udpSenderMsg: (args) => {
+    ipcRenderer.send('udpSenderMsg', { ...args })
   },
   onResponse: (fn) => {
     ipcRenderer.on('onResponse', (e, ...args) => {

@@ -15,6 +15,11 @@ contextBridge.exposeInMainWorld('myAPI', {
       fn(...args)
     })
   },
+  rtFn: (fn) => {
+    ipcRenderer.on('rtFn', (e, ...args) => {
+      fn(...args)
+    })
+  },
   onPromise: async (args) => {
     return await ipcRenderer.invoke('onPromise', { ...args })
   }

@@ -2,8 +2,6 @@ import dgram from 'dgram'
 import { rtMsg } from '../functions'
 
 let server
-let sender
-let senderAddress
 
 const controller = new AbortController()
 const { signal } = controller
@@ -21,16 +19,15 @@ export const createUdpServer = (port, host, multicast) => {
 
     server.on('message', (msg, rinfo) => {
       rtMsg({
-        time: new Date.now(),
         protocol: 'UDP',
         from: `${rinfo.address}:${rinfo.port}`,
-        message: msg
+        message: msg,
+        type: 'byte'
       })
     })
 
     server.on('error', (err) => {
       rtMsg({
-        time: new Date.now(),
         protocol: 'UDP',
         message: `UDP Server Error ${err.stack}`
       })
@@ -45,7 +42,6 @@ export const createUdpServer = (port, host, multicast) => {
           const address = server.address()
           resolve(
             rtMsg({
-              time: new Date.now(),
               protocol: 'UDP',
               message: `UDP Server Open At ${address.address}:${address.port} Multicast Mode`
             })
@@ -56,7 +52,6 @@ export const createUdpServer = (port, host, multicast) => {
           const address = server.address()
           resolve(
             rtMsg({
-              time: new Date.now(),
               protocol: 'UDP',
               message: `UDP Server Open At ${address.address}:${address.port} `
             })
@@ -74,20 +69,8 @@ const closeUDPServer = () => {
   controller.abort()
   server = null
   rtMsg({
-    time: new Date.now(),
     protocol: 'UDP',
     msg: `UDP Server Closed`
-  })
-}
-
-const createUDPSender = (port, host, multicast) => {
-  return new Promise((resolve, reject) => {
-    if (!port) {
-      reject(new Error('Invalid port'))
-    }
-    if (!host) {
-      resolve(new Error('Invalid host'))
-    }
   })
 }
 

@@ -24,124 +24,140 @@ const closeTCPServer = () => {
 }
 
 const createTCPServer = (port, host) => {
-  server = net.createServer()
+  return new Promise((resolve, reject) => {
+    server = net.createServer()
 
-  server.on('error', (err) => {
-    rtMsg({
-      protocol: 'TCP',
-      from: 'TCP',
-      message: `TCP Socket Error ${err}`
-    })
-  })
-
-  server.on('close', () => {
-    rtMsg({
-      protocol: 'TCP',
-      from: 'TCP',
-      message: 'TCP Socket Closed'
-    })
-  })
-
-  server.on('drop', (data) => {
-    rtMsg({
-      protocol: 'TCP',
-      from: 'TCP',
-      message: `TCP Socket Drop MaxConnections: ${server.maxConnections}, Local: ${data.localAddress} ${data.localPort}, Remote: ${data.remoteAddress} ${data.remotePort}`
-    })
-  })
-
-  server.on('connection', (socket) => {
-    clients.push(socket)
-    rtMsg({
-      protocol: 'TCP',
-      from: `${socket.remoteAddress}:${socket.remotePort}`,
-      message: `TCP Socket Connected ${socket.remoteAddress}:${socket.remotePort}`
-    })
-
-    socket.on('error', (err) => {
+    server.on('error', (err) => {
       rtMsg({
         protocol: 'TCP',
-        from: `${socket.remoteAddress}:${socket.remotePort}`,
+        from: 'TCP',
         message: `TCP Socket Error ${err}`
       })
     })
 
-    socket.on('close', () => {
-      clients.splice(clients.indexOf(socket), 1)
+    server.on('close', () => {
       rtMsg({
         protocol: 'TCP',
-        from: `${socket.remoteAddress}:${socket.remotePort}`,
-        message: `TCP Socket Closed ${socket.remoteAddress}:${socket.remotePort}`
+        from: 'TCP',
+        message: 'TCP Socket Closed'
       })
     })
 
-    socket.on('timeout', () => {
+    server.on('drop', (data) => {
+      rtMsg({
+        protocol: 'TCP',
+        from: 'TCP',
+        message: `TCP Socket Drop MaxConnections: ${server.maxConnections}, Local: ${data.localAddress} ${data.localPort}, Remote: ${data.remoteAddress} ${data.remotePort}`
+      })
+    })
+
+    server.on('connection', (socket) => {
+      clients.push(socket)
       rtMsg({
         protocol: 'TCP',
         from: `${socket.remoteAddress}:${socket.remotePort}`,
-        message: `TCP Socket Timeout ${socket.remoteAddress}:${socket.remotePort}`
+        message: `TCP Socket Connected ${socket.remoteAddress}:${socket.remotePort}`
       })
-      clients[clients.indexOf(socket)].destroy()
-      clients.splice(clients.indexOf(socket), 1)
+
+      socket.on('error', (err) => {
+        rtMsg({
+          protocol: 'TCP',
+          from: `${socket.remoteAddress}:${socket.remotePort}`,
+          message: `TCP Socket Error ${err}`
+        })
+      })
+
+      socket.on('close', () => {
+        clients.splice(clients.indexOf(socket), 1)
+        rtMsg({
+          protocol: 'TCP',
+          from: `${socket.remoteAddress}:${socket.remotePort}`,
+          message: `TCP Socket Closed ${socket.remoteAddress}:${socket.remotePort}`
+        })
+      })
+
+      socket.on('timeout', () => {
+        rtMsg({
+          protocol: 'TCP',
+          from: `${socket.remoteAddress}:${socket.remotePort}`,
+          message: `TCP Socket Timeout ${socket.remoteAddress}:${socket.remotePort}`
+        })
+        clients[clients.indexOf(socket)].destroy()
+        clients.splice(clients.indexOf(socket), 1)
+      })
+
+      socket.on('data', (msg) => {
+        rtMsg({
+          protocol: 'TCP',
+          from: `${socket.remoteAddress}:${socket.remotePort}`,
+          message: msg
+        })
+      })
     })
 
-    socket.on('data', (msg) => {
-      rtMsg({
-        protocol: 'TCP',
-        from: `${socket.remoteAddress}:${socket.remotePort}`,
-        message: msg
+    try {
+      server.listen(port, host, () => {
+        rtMsg({
+          protocol: 'TCP',
+          from: 'TCP',
+          message: `TCP Server Start At ${host}:${port}`
+        })
       })
-    })
-  })
-
-  server.listen(port, host, () => {
-    rtMsg({
-      protocol: 'TCP',
-      from: 'TCP',
-      message: `TCP Server Start At ${host}:${port}`
-    })
+      resolve()
+    } catch (err) {
+      reject(err)
+    }
   })
 }
 
 const connectTCPClient = (port, host) => {
-  client = net.connect({ port, host })
+  try {
+    client = net.connect({ port, host })
 
-  client.on('connect', () => {
-    rtMsg({
-      protocol: 'TCP',
-      from: `${host}:${port}`,
-      message: `TCP Socket Connected ${host}:${port} Client Mode`
-    })
-
-    client.on('close', () => {
+    client.on('connect', () => {
       rtMsg({
         protocol: 'TCP',
         from: `${host}:${port}`,
-        message: `TCP Socket Disconnected by Remote`
+        message: `TCP Socket Connected ${host}:${port} Client Mode`
       })
-    })
 
-    client.on('error', (err) => {
-      rtMsg({
-        protocol: 'TCP',
-        from: `${host}:${port}`,
-        message: `TCP Socket Error: ${err}`
+      client.on('close', () => {
+        rtMsg({
+          protocol: 'TCP',
+          from: `${host}:${port}`,
+          message: `TCP Socket Disconnected by Remote`
+        })
       })
-    })
 
-    client.on('data', (data) => {
-      rtMsg({
-        protocol: 'TCP',
-        from: `${host}:${port}`,
-        message: data
+      client.on('error', (err) => {
+        rtMsg({
+          protocol: 'TCP',
+          from: `${host}:${port}`,
+          message: `TCP Socket Error: ${err}`
+        })
+      })
+
+      client.on('data', (data) => {
+        rtMsg({
+          protocol: 'TCP',
+          from: `${host}:${port}`,
+          message: data
+        })
       })
     })
-  })
+  } catch (err) {}
 }
 
 const disconnectTCPClient = () => {
-  client.destroy()
-  client = null
+  return new Promise((resolve, reject) => {
+    try {
+      client.destroy()
+      client = null
+      resolve()
+    } catch (err) {
+      reject(err)
+    }
+  })
 }
 
 const sendMessageTCP = (msg) => {
